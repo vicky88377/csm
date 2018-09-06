@@ -1,6 +1,7 @@
 package com.mindtree.customerservicemanagement;
 
 import java.io.IOException;
+import java.net.URLDecoder;
 
 import javax.servlet.Filter;
 import javax.servlet.FilterChain;
@@ -37,16 +38,14 @@ public class OAuthFilter implements Filter {
 			HttpServletResponse httpResponse = (HttpServletResponse) response;
 
 			String accessToken = httpRequest.getHeader("Authorization");
-			if(accessToken != null)
-				accessToken.replaceAll("Bearer ", "");
+			
 
-			headers.add(HttpHeaders.AUTHORIZATION, accessToken);
+			if (StringUtils.pathEquals(httpRequest.getRequestURI(),"/customers")) {			
 
-			if (StringUtils.pathEquals(httpRequest.getRequestURI(),"/customers")) {
 				try {
 					if (!FireBaseAuthHelper.isValidToken(accessToken)) {
 						httpResponse.sendError(HttpStatus.UNAUTHORIZED.value(),
-								"Unauthorised User");
+								"unauthorised user");
 						return;
 					}
 				} catch (Exception ex) {
