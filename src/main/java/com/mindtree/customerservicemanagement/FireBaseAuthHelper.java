@@ -35,7 +35,7 @@ public class FireBaseAuthHelper {
 	public static Map<String,String> getUserInfo( String firebaseAccessToken ) throws InterruptedException, FirebaseAuthException, ExecutionException {
 		
 		Map userMap = new HashMap();
-		FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdTokenAsync(firebaseAccessToken).get();
+		FirebaseToken decodedToken = FirebaseAuth.getInstance().verifyIdTokenAsync(getAccessTokenStrip(firebaseAccessToken)).get();
  
 		userMap.put("email", decodedToken.getEmail());
 		userMap.put("name", decodedToken.getName());
@@ -43,13 +43,21 @@ public class FireBaseAuthHelper {
 		return userMap;
 	}
 	
-	public static boolean isValidToken( String firebaseAccessToken ) {
+	public static boolean isValidToken( String accessToken ) {
 			
 		try {
-	 		FirebaseAuth.getInstance().verifyIdToken(firebaseAccessToken);
+					
+	 		FirebaseAuth.getInstance().verifyIdToken(getAccessTokenStrip(accessToken));
 		}catch(Exception exec) {
 			return false;
 		}		
 			return true;
 		}
+	
+	private static String getAccessTokenStrip( String accessToken){
+		if(accessToken != null)			
+			accessToken = accessToken.replaceAll("Bearer", "").trim();
+		
+		return accessToken;
+	}
 }
